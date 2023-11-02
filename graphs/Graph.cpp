@@ -52,6 +52,6 @@ listNode **Graph::getAdjList() {
     return adjacencyList;
 }
 
-int Graph::getVeritcesNunber() {
+int Graph::getVeritcesNumber() {
     return verticesNumber;
 }

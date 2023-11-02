@@ -8,23 +8,39 @@
 UndirectedGraph::UndirectedGraph(int verticesNumber, int edgesNumber) : Graph(verticesNumber, edgesNumber) {
     this->verticesNumber = verticesNumber;
     this->edgesNumber = edgesNumber;
+
+    TSPSum = INT_MAX;
+    TSPRoute = new int[verticesNumber - 1];
+    startV = -1;
 }
 
 void UndirectedGraph::addEdge(int tail, int head, int cost) {
-    if(tail == head) {
-        //edgesNumber--;                                                                  //zalozenie, ze przy inicjalizacji podawana jest calkowita liczba krawedzi (nie uwzgledniajac powtorek i krawedzi wierzcholkow samych ze soba)
-        return;                                                                         //jesli rowne to nie dodawaj
+    if (head == tail) {
+        edgesNumber--;                                                              //zalozenia, takie jak przy grafie nieskierowanym
+        return;
     }
-    adjacencyMatrix[tail][head] = cost;                                                 //dodawanie do macierzy sasiedztwa
-    adjacencyMatrix[head][tail] = cost;
+    adjacencyMatrix[tail][head] = cost;                                             //dodawanie do macierzy sasiedztwa
 
-    if(changeAlreadyDefinedEdge(tail, head, cost)) return;                              //jesli taka krawedz byla juz w grafie to ja nadpisz
-    //w przeciwnym wypadku stworz nowy wezel (nowe polaczenie)
-    listNode* newNode = new listNode{head, cost, adjacencyList[tail]};
+    if (changeAlreadyDefinedEdge(tail, head, cost)) return;                         //jesli znajdzie juz taka krawedz, to ja nadpisuje
+    listNode* newNode = new listNode{head, cost, adjacencyList[tail]};  //w przeciwnym wypadku tworzy nowy wezel
     adjacencyList[tail] = newNode;
-    listNode *nextNewNode = new listNode{tail, cost, adjacencyList[head]};
-    adjacencyList[head] = nextNewNode;
 }
+
+//void UndirectedGraph::addEdge(int tail, int head, int cost) {
+//    if(tail == head) {
+//        //edgesNumber--;                                                                  //zalozenie, ze przy inicjalizacji podawana jest calkowita liczba krawedzi (nie uwzgledniajac powtorek i krawedzi wierzcholkow samych ze soba)
+//        return;                                                                         //jesli rowne to nie dodawaj
+//    }
+//    adjacencyMatrix[tail][head] = cost;                                                 //dodawanie do macierzy sasiedztwa
+//    adjacencyMatrix[head][tail] = cost;
+//
+//    if(changeAlreadyDefinedEdge(tail, head, cost)) return;                              //jesli taka krawedz byla juz w grafie to ja nadpisz
+//    //w przeciwnym wypadku stworz nowy wezel (nowe polaczenie)
+//    listNode* newNode = new listNode{head, cost, adjacencyList[tail]};
+//    adjacencyList[tail] = newNode;
+//    listNode *nextNewNode = new listNode{tail, cost, adjacencyList[head]};
+//    adjacencyList[head] = nextNewNode;
+//}
 
 bool UndirectedGraph::changeAlreadyDefinedEdge(int tail, int head, int cost) {
     listNode* n = adjacencyList[tail];
@@ -213,4 +229,69 @@ MSTEdge *UndirectedGraph::MSTPrimAdjList(int r) {
     delete [] V;
     delete [] visitedVertices;
     return MSTtab;
+}
+
+int UndirectedGraph::TSPBruteForce(int startVertex) {
+    if (startVertex < 0 || startVertex > verticesNumber - 1) return 1;
+    TSPSum = INT_MAX;
+    startV = startVertex;
+
+    int *numbers = new int[verticesNumber-1];
+
+    int iterator = 0;
+    for(int i = 0; i  < verticesNumber; i++){
+
+        if(i == startVertex) continue;
+        numbers[iterator] = i;
+        iterator++;
+
+    }
+    generatePermutations(numbers, 0);
+    return 0;
+}
+
+void UndirectedGraph::swap(int &a, int &b) {
+    int temp = a;
+    a = b;
+    b = temp;
+}
+
+void UndirectedGraph::generatePermutations(int *verticesTable, int currentIndex) {
+    int numbersCount = verticesNumber-1;
+    int tmp_sum = 0;
+
+    if (currentIndex == numbersCount){
+        tmp_sum += adjacencyMatrix[startV][verticesTable[0]];
+        for (int i = 0; i < numbersCount - 1; i++){
+            tmp_sum += adjacencyMatrix[verticesTable[i]][verticesTable[i+1]];
+        }
+        tmp_sum += adjacencyMatrix[verticesTable[numbersCount-1]][startV];
+
+        if (tmp_sum < TSPSum){
+            TSPSum = tmp_sum;
+            for(int i = 0; i < numbersCount; i++){
+                TSPRoute[i] = verticesTable[i];
+            }
+        }
+        return;
+    }
+
+    for (int i = currentIndex; i < numbersCount; ++i){
+        swap(verticesTable[currentIndex], verticesTable[i]);
+        generatePermutations(verticesTable, currentIndex + 1);
+        swap(verticesTable[currentIndex], verticesTable[i]);
+    }
+}
+
+UndirectedGraph::~UndirectedGraph() {
+    delete [] TSPRoute;
+
+}
+
+int UndirectedGraph::getTSPSum() {
+    return TSPSum;
+}
+
+int *UndirectedGraph::getTSPRoute() {
+    return TSPRoute;
 }

@@ -10,6 +10,7 @@
 
 
 #include <string>
+#include <vector>
 
 enum color{WHITE, GREY, BLACK};                                     //do DFS
 
@@ -17,8 +18,17 @@ class UndirectedGraph : public Graph {
 
     void DFSVisit(int u, color *&colors, int *&parents, int time);
 
+private:
+    int startV;
+    int TSPSum;
+    int *TSPRoute;
+
 public:
-    UndirectedGraph(int verticesNumber, int edgesNumber);           //dla MST
+    UndirectedGraph(int verticesNumber, int edgesNumber);
+    ~UndirectedGraph();
+
+
+
 
     void addEdge(int tail, int head, int cost);                     //tail - wierzcholek poczatkowy, head - wierzcholek koncowy
     bool changeAlreadyDefinedEdge(int tail, int head, int cost);
@@ -31,8 +41,12 @@ public:
     MSTEdge* MSTPrimAdjMatrix(int r);                               //r - wierzcholek od ktorego zaczynamy wyznaczanie drzewa
     MSTEdge* MSTPrimAdjList(int r);
 
-    void sortMSTTab(int p, int r);                                  //quicksort po peirwszym wierzcholku
 
+    void swap(int &a, int&b);
+    void generatePermutations(int *verticesTable, int currentIndex);
+    int TSPBruteForce(int startVertex);
+    int getTSPSum();
+    int* getTSPRoute();
 };
 
 

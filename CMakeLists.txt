@@ -15,4 +15,7 @@ add_executable(PEA_Projekt_1 main.cpp
         structures/PriorityQueue.cpp
         structures/PriorityQueue.h
         representations/GraphRep.cpp
-        representations/GraphRep.h)
+        representations/GraphRep.h
+        data/TimeTests.cpp
+        data/TimeTests.h
+)

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <chrono>
 #include "data/DataReader.h"
 #include "representations/GraphRep.h"
 #include "graphs/UndirectedGraph.h"
@@ -6,7 +7,6 @@
 using namespace std;
 
 void menu();
-void insertDataToTheGraph(DataReader *fileData, UndirectedGraph *&graph);
 
 int main() {
     cout << "Autorka: Maria Kranz, nr indeksu: 263985" << endl;
@@ -19,6 +19,7 @@ void menu(){
     string filePath;
     UndirectedGraph *graph = nullptr;
     char choice;
+    int startV;
 
     do{
         cout << "\n----MENU----\n"
@@ -35,29 +36,48 @@ void menu(){
             case '1':
                 cout << "Podaj nazwe pliku: ";
                 cin >> filePath;
-                //filePath = "..\\tsp_10.txt";
+                //filePath = "..\\tsp_11.txt";
                 //dataReader->readDataFromFile(filePath);
 
                 //insertDataToTheGraph(dataReader, graph);
                 graph = dataReader->createGraphFromTheData(filePath);
-                GraphRep::printAdjacencyMatrix(graph->getAdjMatrix(), graph->getVeritcesNunber());
+                if (graph != nullptr){
+                    GraphRep::printAdjacencyMatrix(graph->getAdjMatrix(), graph->getVeritcesNumber());
+                }else{
+                    cout << "Bledy przy odczytywaniu danych." << endl;
+                }
                 break;
             case '2':
-                //
+                if(graph){
+                    cout << "Podaj wierzcholek startowy: ";
+                    cin >> startV;
+
+                    auto start = std::chrono::high_resolution_clock::now();
+                    int val = graph->TSPBruteForce(startV);                       //ostatnio dodany wierzcholek z ktorego wychodzi krawedz
+                    auto end = std::chrono::high_resolution_clock::now();
+
+                    long dur = (long)std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+
+                    std::cout << "Czas wykonania: " << dur << " milisekundy" << std::endl;
+
+                    if(val == 0 ){
+                        cout << "Wartosc najkrotszej sciezki = " << graph->getTSPSum() << endl;
+                        cout << startV;
+
+                        int *route = graph->getTSPRoute();
+                        for(int v = 0; v < graph->getVeritcesNumber() - 1; v++){
+                            cout << " -> " << route[v];
+                        }
+                        cout << " -> " << startV << endl;
+                    }else{
+                        cout << "Bledny wierzcholek." << endl;
+                    };
+                }else{
+                    cout << "Nie zaladowano grafu." << endl;
+                }
                 break;
         }
     }while (choice != '0');
 
     delete graph;
 }
-
-//void insertDataToTheGraph(DataReader *fileData, UndirectedGraph *&graph) {
-//    int verticesNum = 0;
-//    verticesNum = fileData->getVerticesNumber();
-//    graph = new UndirectedGraph(verticesNum, fileData->getEdgesNumber());
-//    edge* data = fileData->getEdges();
-//    for (int i = 0; i < fileData->getEdgesNumber(); i++) {
-//        edge edgeData = data[i];
-//        graph->addEdge(edgeData.tail, edgeData.head, edgeData.cost);
-//    }
-//}

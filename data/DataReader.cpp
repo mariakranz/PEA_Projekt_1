@@ -99,11 +99,14 @@ UndirectedGraph* DataReader::createGraphFromTheData(std::string filePath) {
 
         auto *graph = new UndirectedGraph(verticesNumber, edgesNumber);
 
+        int cost;
+        int nth;
         int index = 0;
         for (int i = 0; i < verticesNumber; i++) {
             for (int j = 0; j < verticesNumber; j++){
-                if( i < j){
-                    int cost;
+                if ( i == j ){
+                    file >> nth;
+                } else{
                     file >> cost;
 
                     if(file.fail())
@@ -112,12 +115,24 @@ UndirectedGraph* DataReader::createGraphFromTheData(std::string filePath) {
                         file.close();
                     }
                     graph->addEdge(i, j, cost);
-                    index ++;
                 }
-                else{
-                    int nth;
-                    file >> nth;
-                }
+
+//                if( i < j){
+//                    int cost;
+//                    file >> cost;
+//
+//                    if(file.fail())
+//                    {
+//                        delete &graph;
+//                        file.close();
+//                    }
+//                    graph->addEdge(i, j, cost);
+//                    index ++;
+//                }
+//                else{
+//                    int nth;
+//                    file >> nth;
+//                }
             }
         }
 
