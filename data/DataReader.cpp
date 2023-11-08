@@ -82,7 +82,7 @@ DataReader::~DataReader() {
 //    return edgesTab;
 //}
 
-UndirectedGraph* DataReader::createGraphFromTheData(std::string filePath) {
+DirectedGraph* DataReader::createGraphFromTheData(std::string filePath) {
     std::fstream file;
     file.open(filePath, std::ios::in);
 
@@ -97,7 +97,7 @@ UndirectedGraph* DataReader::createGraphFromTheData(std::string filePath) {
         }
         int edgesNumber = (verticesNumber * verticesNumber - verticesNumber)/2;
 
-        auto *graph = new UndirectedGraph(verticesNumber, edgesNumber);
+        auto *graph = new DirectedGraph(verticesNumber, edgesNumber);
 
         int cost;
         int nth;
@@ -111,7 +111,7 @@ UndirectedGraph* DataReader::createGraphFromTheData(std::string filePath) {
 
                     if(file.fail())
                     {
-                        delete &graph;
+                        delete graph;
                         file.close();
                     }
                     graph->addEdge(i, j, cost);

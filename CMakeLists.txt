@@ -8,8 +8,8 @@ add_executable(PEA_Projekt_1 main.cpp
         data/DataReader.h
         graphs/Graph.cpp
         graphs/Graph.h
-        graphs/UndirectedGraph.cpp
-        graphs/UndirectedGraph.h
+        graphs/DirectedGraph.cpp
+        graphs/DirectedGraph.h
         structures/Set.cpp
         structures/Set.h
         structures/PriorityQueue.cpp

@@ -6,7 +6,7 @@
 #define PEA_PROJEKT_1_DATAREADER_H
 
 #include <string>
-#include "../graphs/UndirectedGraph.h"
+#include "../graphs/DirectedGraph.h"
 
 //struct edge{
 //    int tail;       //tail -> head
@@ -33,7 +33,7 @@ public:
 //    int getEndVertex();
 //    edge* getEdges();
 
-    UndirectedGraph* createGraphFromTheData(std::string filePath);
+    DirectedGraph* createGraphFromTheData(std::string filePath);
 };
 
 
