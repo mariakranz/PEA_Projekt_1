@@ -8,32 +8,11 @@
 #include <string>
 #include "../graphs/DirectedGraph.h"
 
-//struct edge{
-//    int tail;       //tail -> head
-//    int head;
-//    int cost;
-//};
-
 class DataReader {
-//    int verticesNumber;
-//    int edgesNumber;
-//    int startVertex;
-//    int endVertex;
-//    //int **edges;
-//    edge* edgesTab;     //wskaznik na tablice struktur
 
 public:
-    DataReader();
-    ~DataReader();
-
-//    int readDataFromFile(std::string fileName);
-//    int getVerticesNumber();
-//    int getEdgesNumber();
-//    int getStartVertex();
-//    int getEndVertex();
-//    edge* getEdges();
-
-    DirectedGraph* createGraphFromTheData(std::string filePath);
+    static DirectedGraph* createGraphFromTheData(std::string filePath);
+    static DirectedGraph* createRandomGraph(int verticesNumber);
 };
 
 

@@ -12,27 +12,18 @@
 #include <string>
 #include <vector>
 
-enum color{WHITE, GREY, BLACK};                                     //do DFS
-
-struct reduce{
-    int** redAdjMat;
-    int minBuond;
-};
+enum color{WHITE, GREY};                                     //do DFS
 
 class DirectedGraph : public Graph {
 
-    void DFSVisit(int u, color *&colors, int *&parents, int time, int lowerBound, int &upperBound, int *&helperTab);
+    void DFSVisit(int u, color *&colors, int *&parents, int lowerBound, int &upperBound, int *&helperTab);            //dfs O(V+E)
 
 private:
-    int startV;
-    int TSPSum;
     int *TSPRoute;
     void swap(int &a, int&b);
-    void generatePermutations(int *verticesTable, int currentIndex);
+    void generatePermutations(int *verticesTable, int currentIndex, int &TSPSum, int startV);
 
     int * tspParentsRoute;                                          //do zapisania sciezki w BnB
-
-
 
 public:
     DirectedGraph(int verticesNumber, int edgesNumber);
@@ -42,23 +33,10 @@ public:
     bool changeAlreadyDefinedEdge(int tail, int head, int cost);
 
     int TSPBruteForce(int startVertex);                             //zlozonosc O((n-1)!)
-    int getTSPSum();
     int* getTSPRoute();
 
-
-    //int upperBound;
     int TSPBranchAndBound();
     int* getTSPRouteBnB();
-
-    reduce* reduceAndCalculateBound(int **adjMatrix);
-
-    int TSPDP();
-    int tsp(int mask, int pos);
-    int visitedAll;
-    int **dp;
-
-
-
 };
 
 

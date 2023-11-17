@@ -3,6 +3,8 @@ project(PEA_Projekt_1)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_EXE_LINKER_FLAGS "-static")
+
 add_executable(PEA_Projekt_1 main.cpp
         data/DataReader.cpp
         data/DataReader.h
@@ -10,10 +12,6 @@ add_executable(PEA_Projekt_1 main.cpp
         graphs/Graph.h
         graphs/DirectedGraph.cpp
         graphs/DirectedGraph.h
-        structures/Set.cpp
-        structures/Set.h
-        structures/PriorityQueue.cpp
-        structures/PriorityQueue.h
         representations/GraphRep.cpp
         representations/GraphRep.h
         data/TimeTests.cpp

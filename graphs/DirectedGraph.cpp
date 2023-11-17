@@ -2,42 +2,21 @@
 // Created by Szef on 14.10.2023.
 //
 
-#include <iostream>
 #include <valarray>
 #include "DirectedGraph.h"
-#include "../structures/PriorityQueue.h"
 
 DirectedGraph::DirectedGraph(int verticesNumber, int edgesNumber) : Graph(verticesNumber, edgesNumber) {
     this->verticesNumber = verticesNumber;
     this->edgesNumber = edgesNumber;
 
-    TSPSum = INT_MAX;
-    TSPRoute = new int[verticesNumber - 1];
-    startV = -1;
-
-    visitedAll = (1<<verticesNumber) - 1;
-
-    //dp = new int*[pow(2, verticesNumber)][3];
-    int num = (int)pow((double)2, (double)verticesNumber);
-    dp = new int *[num];
-    for(int i = 0; i < (1<<verticesNumber); i++){
-        dp[i] = new int[verticesNumber];
-        for(int j = 0; j < verticesNumber; j ++){
-            dp[i][j] = -1;
-        }
-    }
-
-    //upperBound = INT_MAX;
+    TSPRoute = new int[verticesNumber];
     tspParentsRoute = new int [verticesNumber];
+
 }
 
 DirectedGraph::~DirectedGraph() {
     delete [] TSPRoute;
-
-    for(int i = 0; i < (1<<verticesNumber); i++){
-        delete [] dp[i];
-    }
-    delete [] dp;
+    delete [] tspParentsRoute;
 }
 
 void DirectedGraph::addEdge(int tail, int head, int cost) {
@@ -71,8 +50,7 @@ bool DirectedGraph::changeAlreadyDefinedEdge(int tail, int head, int cost) {
 
 int DirectedGraph::TSPBruteForce(int startVertex) {
     if (startVertex < 0 || startVertex > verticesNumber - 1) return 1;
-    TSPSum = INT_MAX;
-    startV = startVertex;
+    int TSPSum = INT_MAX;
 
     int *numbers = new int[verticesNumber-1];
 
@@ -84,8 +62,10 @@ int DirectedGraph::TSPBruteForce(int startVertex) {
         iterator++;
 
     }
-    generatePermutations(numbers, 0);
-    return 0;
+
+    TSPRoute[0] = startVertex;                                                                  //elementam pierwszym cyklu jest wierzcholek startowy
+    generatePermutations(numbers, 0, TSPSum, startVertex);
+    return TSPSum;
 }
 
 void DirectedGraph::swap(int &a, int &b) {
@@ -94,7 +74,7 @@ void DirectedGraph::swap(int &a, int &b) {
     b = temp;
 }
 
-void DirectedGraph::generatePermutations(int *verticesTable, int currentIndex) {
+void DirectedGraph::generatePermutations(int *verticesTable, int currentIndex, int &TSPSum, int startV) {
     int numbersCount = verticesNumber-1;
     int tmp_sum = 0;
 
@@ -107,8 +87,8 @@ void DirectedGraph::generatePermutations(int *verticesTable, int currentIndex) {
 
         if (tmp_sum < TSPSum){
             TSPSum = tmp_sum;
-            for(int i = 0; i < numbersCount; i++){
-                TSPRoute[i] = verticesTable[i];
+            for(int i = 1; i < verticesNumber; i++){
+                TSPRoute[i] = verticesTable[i - 1];
             }
         }
         return;
@@ -116,101 +96,42 @@ void DirectedGraph::generatePermutations(int *verticesTable, int currentIndex) {
 
     for (int i = currentIndex; i < numbersCount; ++i){
         swap(verticesTable[currentIndex], verticesTable[i]);
-        generatePermutations(verticesTable, currentIndex + 1);
+        generatePermutations(verticesTable, currentIndex + 1, TSPSum, startV);
         swap(verticesTable[currentIndex], verticesTable[i]);
     }
 }
 
-int DirectedGraph::getTSPSum() {
-    return TSPSum;
-}
-
-int *DirectedGraph::getTSPRoute() {
+int *DirectedGraph::getTSPRoute() {         //najpierw trzeba wywolac TSPBruteForce(int startVertex)
     return TSPRoute;
 }
 
-int DirectedGraph::TSPDP() {
-
-
-    std::cout << "min sciezka = " << tsp(1,0) << std::endl;
-    return 0;
-}
-
-int DirectedGraph::tsp(int mask, int pos) {
-
-    if(mask == visitedAll){
-        return adjacencyMatrix[pos][0];
-    }
-
-    if(dp[mask][pos] != -1){
-        return dp[mask][pos];
-    }
-    int ans = INT_MAX;
-
-    for(int city = 0; city < verticesNumber; city++){
-
-        if((mask&(1<<city))==0){
-
-            int newAns = adjacencyMatrix[pos][city] + tsp(mask|(1<<city), city);
-            ans = std::min(ans, newAns);
-        }
-    }
-    return dp[mask][pos] = ans;
-}
-
-
-reduce *DirectedGraph::reduceAndCalculateBound(int **adjMatrix) {
-    //dla kazdego wiersza znajdz min i odejmij
-
-    for(int wiersz = 0; wiersz < verticesNumber; wiersz++){
-        int min = INT_MAX;
-        for(int kolumna = 0; kolumna < verticesNumber; kolumna++){
-            if (adjMatrix[wiersz][kolumna] < min) min = adjMatrix[wiersz][kolumna];
-        }
-
-        if(min != INT_MAX || min != 0){
-            for(int kolumna = 0; kolumna < verticesNumber; kolumna++){
-                adjMatrix[wiersz][kolumna] -= min;
-            }
-        }
-    }
-
-
-
-    return nullptr;
-}
-
-void DirectedGraph::DFSVisit(int u, color *&colors, int *&parents, int time, int lowerBound, int &upperBound, int *&helperTab) {
-    int *d = new int[verticesNumber];
-    int *f = new int[verticesNumber];
+void DirectedGraph::DFSVisit(int u, color *&colors, int *&parents, int lowerBound, int &upperBound, int *&helperTab) {
 
     colors[u] = GREY;
-    d[u] = time = time+1;
-    listNode* v = adjacencyList[u];
     bool isLeaf = true;
-    while(v){
-        if(colors[v->vertex] == WHITE){
+    for(int v = 0; v < verticesNumber; v++){
+        if(v == u) continue;
+        if(colors[v] == WHITE){
             isLeaf = false;
-            int newLowerBound = lowerBound - helperTab[u] + v->cost;
+            int newLowerBound = lowerBound - helperTab[u] + adjacencyMatrix[u][v];
             if(newLowerBound < upperBound){
-                parents[v->vertex] = u;
-                DFSVisit(v->vertex, colors, parents, time, newLowerBound, upperBound, helperTab);
+                parents[v] = u;
+                DFSVisit(v, colors, parents, newLowerBound, upperBound, helperTab);
             }
         }
-        v = v->next;
     }
 
     colors[u] = WHITE;
     if(isLeaf){
+
         int path = lowerBound - helperTab[u] + adjacencyMatrix[u][0];
         if (path < upperBound){
-            upperBound = path;      //ustaw nowa gorna granice
+            upperBound = path;                                              //ustawia nowa gorna granice
             for(int i = 0; i < verticesNumber; i++){
                 tspParentsRoute[i] = parents[i];
-            }           //zapamietaj granice i sciezka
+            }                                                               //zapamietuje granice i sciezka
         }
     }
-    f[u] = time = time+1;
 }
 
 int DirectedGraph::TSPBranchAndBound() {
@@ -227,23 +148,24 @@ int DirectedGraph::TSPBranchAndBound() {
         helperTab[i] = min;
         lowerBound += min;
     }
-                                               //ilosc drzew, czyli osobnych sciezek
+
     color* colors = new color[verticesNumber];
     int* parents = new int[verticesNumber];
-    int  time;
 
     for (int i = 0; i < verticesNumber; i++){
         colors[i] = WHITE;
         parents[i] = -1;
     }
-    time = 0;
 
-    DFSVisit(0, colors, parents, time, lowerBound, upperBound, helperTab);
+    DFSVisit(0, colors, parents, lowerBound, upperBound, helperTab);
 
+    delete [] colors;
+    delete [] parents;
     return upperBound;
 }
 
 int *DirectedGraph::getTSPRouteBnB() {
+    if(tspParentsRoute == nullptr) return nullptr;      //najpierw trzeba wywolac TSPBranchAndBound()
     int *tab = new int [verticesNumber];
 
     //znajdź -1 i wstaw do tab na pierwszą pozycje

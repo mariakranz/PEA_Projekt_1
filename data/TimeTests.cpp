@@ -3,72 +3,89 @@
 //
 
 #include <ios>
+#include <chrono>
+#include <iostream>
+#include <fstream>
 #include "TimeTests.h"
+#include "../graphs/DirectedGraph.h"
+#include "DataReader.h"
 
-using namespace std;
+void TimeTests::testBruteForce(std::string folderPath) {
+    std::string outputFileName = "testBruteForce.txt";
+    std::cout << std::endl << std::endl << "testBruteForce" << std::endl;
 
-//int TimeTests::testDijkstraList() {
-//    string filename = "DijkstraList_results.txt";
-//
-//    string fullpath = directory + filename;
-//    ofstream file;
-//    file.open(fullpath, std::ios::out);
-//    if(file.is_open()){
-//        file << "density";                          //wpisywanie wiersza naglowkowego
-//        for(int i = 0; i < VERTNUM; i++){
-//            file << ";size" << vertNum[i];
-//        }
-//        file << endl;
-//
-//        for(int i = 0; i < DENNUM; i++){
-//            for (int k = 0; k < NUMTINST; k++){
-//                file << density[i];
-//                for (int j = 0; j < VERTNUM; j++){
-//                    int verticesNum = vertNum[j];
-//                    int maxUndirectedEdges = (verticesNum * (verticesNum - 1));
-//                    int edgesNum = maxUndirectedEdges * density[i] / 100;
-//
-//                    DirectedGraph* graph = new DirectedGraph(verticesNum, edgesNum);
-//
-//                    edgeT* takenEdges = new edgeT[edgesNum];
-//                    int edgeNR = 0;
-//                    int tail;
-//                    int head;
-//
-//                    for(; edgeNR < edgesNum; edgeNR++){
-//                        do{
-//                            tail = rand() %verticesNum;
-//                            do{
-//                                head = rand() %verticesNum;
-//                            }while(tail == head);
-//
-//                        }while (isEdgeTaken(tail, head, takenEdges, edgesNum));
-//                        takenEdges[edgeNR] = {tail, head};
-//                        graph->addEdge(tail, head, rand() % edgesNum + 1);
-//                    }
-//
-//                    std::cout << "Graf " << k << " - density: " << density[i] << "rozmiar: " << vertNum[j] << endl;
-//
-//                    auto start = std::chrono::high_resolution_clock::now();
-//                    graph->DijkstraAdjList(rand() % verticesNum);                       //ostatnio dodany wierzcholek z ktorego wychodzi krawedz
-//                    auto end = std::chrono::high_resolution_clock::now();
-//
-//                    long dur = (long)std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count();
-//
-//                    std::cout << "Czas wykonania: " << dur << " nanosekundy" << std::endl;
-//                    file << ";" << dur;
-//
-//                    delete graph;
-//                    delete [] takenEdges;
-//                }
-//                file << endl;
-//            }
-//        }
-//    }else {
-//        cout << "Nie udalo sie odtworzyc pliku." << endl;
-//        return - 1;
-//    }
-//
-//    file.close();
-//    return 0;
-//}
+    std::string fullpath = folderPath + outputFileName;
+    std::ofstream file;
+    file.open(fullpath, std::ios::out);
+
+    if (file.is_open()) {
+        file << "size;time[us]";                          //wpisywanie wiersza naglowkowego
+        file << std::endl;
+
+        DirectedGraph *graph;
+        int vertNum;
+        for (int graphs_size: graphs_sizes_bf) {
+
+            vertNum = graphs_size;
+            for (int j = 0; j < GRAPHS_NUMBER; j++) {
+
+                std::cout << "Graf " << j << "rozmiar: " << vertNum << std::endl;
+
+                graph = DataReader::createRandomGraph(vertNum);
+
+                auto start = std::chrono::high_resolution_clock::now();
+                graph->TSPBruteForce(0);
+                auto end = std::chrono::high_resolution_clock::now();
+
+                long dur = (long) std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+                std::cout << "Czas wykonania: " << dur << " us." << std::endl;
+                file << vertNum << ";" << dur << std::endl;
+
+                delete graph;
+
+            }
+        }
+
+    }
+}
+
+void TimeTests::testBranchAndBound(std::string folderPath) {
+    std::string outputFileName = "testBranchAndBound.txt";
+    std::cout << std::endl << std::endl << "testBranchAndBound" << std::endl;
+
+    std::string fullpath = folderPath + outputFileName;
+    std::ofstream file;
+    file.open(fullpath, std::ios::out);
+
+    if (file.is_open()) {
+        file << "size;time[us]";                          //wpisywanie wiersza naglowkowego
+        file << std::endl;
+
+        DirectedGraph *graph;
+        int vertNum;
+        for (int graphs_size: graphs_sizes_bnb) {
+
+            vertNum = graphs_size;
+            for (int j = 0; j < GRAPHS_NUMBER; j++) {
+
+                std::cout << "Graf " << j << "rozmiar: " << vertNum << std::endl;
+
+                graph = DataReader::createRandomGraph(vertNum);
+
+                auto start = std::chrono::high_resolution_clock::now();
+                graph->TSPBranchAndBound();
+                auto end = std::chrono::high_resolution_clock::now();
+
+                long dur = (long) std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+                std::cout << "Czas wykonania: " << dur << " us." << std::endl;
+                file << vertNum << ";" << dur << std::endl;
+
+                delete graph;
+
+            }
+        }
+
+    }
+}
