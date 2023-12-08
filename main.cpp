@@ -10,7 +10,7 @@ using namespace std;
 void menu();
 
 int main() {
-    cout << "Autorka: Maria Kranz, nr indeksu: 263985" << endl;
+    cout << "Autorka: Maria Kranz" << endl;
     menu();
     return 0;
 }

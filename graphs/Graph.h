@@ -5,15 +5,6 @@
 #ifndef PEA_PROJEKT_1_GRAPH_H
 #define PEA_PROJEKT_1_GRAPH_H
 
-
-struct MSTEdge{                                 //krawedzie drzewa
-    int tail, head, cost;
-};
-
-struct setNode{                                 //do klasy Set i PriorityQueue
-    int rank, parent;
-};
-
 struct listNode{                                //element listy sąsiedztwa
     int vertex, cost;
     listNode* next;
