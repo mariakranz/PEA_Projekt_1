@@ -1,4 +1,4 @@
-# Implementacja i analiza efektywności algorytmu podziału i ograniczeń
+# Implementacja i analiza efektywności algorytmu przeszukiwania zupełnego oraz algorytmu podziału i ograniczeń dla problemu komiwojażera
 
 Zadanie polegało na zaimplementowaniu algoytmów rozwiązujących problem komiwojażera, takich jak przegląd zupełny (brute force) i metoda podziału i ograniczeń (branch and bound).
 
